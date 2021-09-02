@@ -308,7 +308,7 @@ class PhotoAlbum(object):
     @property
     def photos(self):
         """Returns the album photos."""
-        offset = random.randrange(0, self._len - 1, min(self.page_size, self._len))
+        offset = random.randrange(0, len(self) - 1, min(self.page_size, len(self)))
 
         if self.direction == "DESCENDING":
             offset -= 1
