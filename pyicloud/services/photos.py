@@ -1,6 +1,8 @@
 """Photo service."""
 import json
 import base64
+import random
+
 from six import PY2
 
 # fmt: off
@@ -306,10 +308,10 @@ class PhotoAlbum(object):
     @property
     def photos(self):
         """Returns the album photos."""
+        offset = random.randrange(0, self._len - 1, min(self.page_size, self._len))
+
         if self.direction == "DESCENDING":
-            offset = len(self) - 1
-        else:
-            offset = 0
+            offset -= 1
 
         while True:
             url = ("%s/records/query?" % self.service.service_endpoint) + urlencode(
