@@ -245,7 +245,7 @@ class PhotoAlbum(object):
         obj_type,
         direction,
         query_filter=None,
-        page_size=100,
+        page_size=10,
     ):
         self.name = name
         self.service = service
@@ -308,7 +308,12 @@ class PhotoAlbum(object):
     @property
     def photos(self):
         """Returns the album photos."""
-        offset = random.randrange(0, len(self) - 1, min(self.page_size, len(self)))
+
+        # Prepare all the different offsets at which we can start retrieving photos
+        offsets = [i for i in range(0, len(self) - 1, min(self.page_size, len(self)))]
+
+        # Pick an offset at random.
+        offset = offsets.pop(random.randint(0, len(offsets) - 1))
 
         if self.direction == "DESCENDING":
             offset -= 1
@@ -339,16 +344,14 @@ class PhotoAlbum(object):
 
             master_records_len = len(master_records)
             if master_records_len:
-                if self.direction == "DESCENDING":
-                    offset = offset - master_records_len
-                else:
-                    offset = offset + master_records_len
-
                 for master_record in master_records:
                     record_name = master_record["recordName"]
                     yield PhotoAsset(
                         self.service, master_record, asset_records[record_name]
                     )
+
+                # All of the photos at this offset has been yielded. Pick the next offset at random.
+                offset = offsets.pop(random.randint(0, len(offsets) - 1))
             else:
                 break
 
