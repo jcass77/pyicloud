@@ -621,12 +621,17 @@ class PhotoAsset:
                             version["url"] = None
 
                         type_entry = fields.get("%sFileType" % prefix)
+                        type_entry = fields.get("%sFileType" % prefix)
                         if type_entry:
                             version["type"] = type_entry["value"]
 
-                            base, suffix = os.path.splitext(self.filename)
-                            if type_entry in self.ITEM_TYPE_SUFFIX:
-                                version['filename'] = f"{base}.{self.ITEM_TYPE_SUFFIX[suffix]}"
+                            *base, suffix = self.filename.split(".")
+                            base = ".".join(base)
+                            suffix = self.ITEM_TYPE_SUFFIX.get(
+                                type_entry["value"], suffix
+                            )
+
+                            version["filename"] = f"{base}.{suffix}"
 
                         else:
                             version["type"] = None
