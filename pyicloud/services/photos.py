@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 from datetime import datetime, timezone
 from pyicloud.exceptions import PyiCloudServiceNotActivatedException
-import os
+from utils import BPListReader
 
 class PhotosService:
     """The 'Photos' iCloud service."""
@@ -544,6 +544,28 @@ class PhotoAsset:
         return base64.b64decode(
             self._master_record["fields"]["filenameEnc"]["value"]
         ).decode("utf-8")
+
+    @property
+    def caption(self):
+        """Gets the photo caption/title."""
+        if self._master_record["fields"].get("captionEnc"):
+            return base64.b64decode(
+                self._master_record["fields"]["captionEnc"]["value"]
+            ).decode("utf-8")
+
+    @property
+    def description(self):
+        """Gets the photo description."""
+        if self._master_record["fields"].get("extendedDescEnc"):
+            return base64.b64decode(
+                self._master_record["fields"]["extendedDescEnc"]["value"]
+            ).decode("utf-8")
+
+    def location(self):
+        if self._asset_record['fields'].get('locationEnc'):
+            value = base64.b64decode(photo._asset_record['fields']['locationEnc']['value'])
+
+            return BPListReader(value).parse()
 
     @property
     def size(self):
