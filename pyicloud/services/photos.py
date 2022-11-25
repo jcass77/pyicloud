@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 from datetime import datetime, timezone
 from pyicloud.exceptions import PyiCloudServiceNotActivatedException
-
+import os
 
 class PhotosService:
     """The 'Photos' iCloud service."""
@@ -461,6 +461,12 @@ class PhotoAlbum:
                 "itemId",
                 "position",
                 "isKeyAsset",
+                "isLivePhoto",
+                "description",
+                "title", 
+                "caption",
+                "keywords",
+                "labels"
             ],
             "zoneID": {"zoneName": "PrimarySync"},
         }
@@ -494,6 +500,13 @@ class PhotoAsset:
         u"com.apple.quicktime-movie": u"movie"
     }
 
+    ITEM_TYPE_SUFFIX = {
+        u"public.heic": u"HEIC",
+        u"public.jpeg": u"JPEG",
+        u"public.png": u"PNG",
+        u"com.apple.quicktime-movie": u"MOV"
+    }
+
     PHOTO_VERSION_LOOKUP = {
         "full": "resJPEGFull",
         "large": "resJPEGLarge",
@@ -502,6 +515,7 @@ class PhotoAsset:
         "sidecar": "resSidecar",
         "original": "resOriginal",
         "original_alt": "resOriginalAlt",
+        "live": "resOriginalVidCompl"
     }
 
     VIDEO_VERSION_LOOKUP = {
@@ -609,6 +623,11 @@ class PhotoAsset:
                         type_entry = fields.get("%sFileType" % prefix)
                         if type_entry:
                             version["type"] = type_entry["value"]
+
+                            base, suffix = os.path.splitext(self.filename)
+                            if type_entry in self.ITEM_TYPE_SUFFIX:
+                                version['filename'] = f"{base}.{self.ITEM_TYPE_SUFFIX[suffix]}"
+
                         else:
                             version["type"] = None
 
