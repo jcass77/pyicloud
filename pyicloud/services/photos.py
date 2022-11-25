@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 from datetime import datetime, timezone
 from pyicloud.exceptions import PyiCloudServiceNotActivatedException
-from utils import BPListReader
+from pyicloud.utils import BPListReader
 
 class PhotosService:
     """The 'Photos' iCloud service."""
