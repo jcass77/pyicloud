@@ -572,13 +572,13 @@ class PhotoAsset:
     def latitude(self):
         location = self.location
         if location:
-            return location['lat']
+            return location['lat'][1]
     
     @property
     def longitude(self):
         location = self.location
         if location:
-            return location['lon']
+            return location['lon'][1]
         
 
 
