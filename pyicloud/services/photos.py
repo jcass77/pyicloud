@@ -569,19 +569,41 @@ class PhotoAsset:
             return BPListReader(value).parse()
 
     @property
+    def mediaMetaData(self):
+        if self._master_record['fields'].get('mediaMetaDataEnc'):
+            value = base64.b64decode(self._master_record['fields']['mediaMetaDataEnc']['value'])
+            return BPListReader(value).parse()
+
+
+    @property
     def latitude(self):
         location = self.location
         if location:
             return location['lat'][1]
+        metadata = self.mediaMetaData
+        if metadata and metadata['{GPS}']:
+            return metadata['{GPS}']['Latitude'][1]
+
     
     @property
     def longitude(self):
         location = self.location
         if location:
             return location['lon'][1]
+        metadata = self.mediaMetaData
+        if metadata and metadata['{GPS}']:
+            return metadata['{GPS}']['Longitude'][1]
         
+    @property
+    def isHidden(self):
+        if self._asset_record['fields'].get('isHidden'):
+            return self._asset_record['fields'].get('isHidden')['value']
 
-
+    @property
+    def isFavorite(self):
+        if self._asset_record['fields'].get('isFavorite'):
+            return self._asset_record['fields'].get('isFavorite')['value']
+            
     @property
     def size(self):
         """Gets the photo size."""
