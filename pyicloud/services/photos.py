@@ -202,6 +202,7 @@ class PhotosService:
                     folder_obj_type,
                     "ASCENDING",
                     query_filter,
+                    folder=folder
                 )
                 self._albums[folder_name] = album
 
@@ -239,6 +240,7 @@ class PhotoAlbum:
         direction,
         query_filter=None,
         page_size=100,
+        folder=None
     ):
         self.name = name
         self.service = service
@@ -249,11 +251,22 @@ class PhotoAlbum:
         self.page_size = page_size
 
         self._len = None
+        self._folder = folder
 
     @property
     def title(self):
         """Gets the album name."""
         return self.name
+
+    
+    def id(self):
+        return self._folder.get("recordName")
+    
+    @property
+    def created(self):
+        created = self._folder.get("created", {}).get("timestamp")
+        if created:
+            return datetime.fromtimestamp(created / 1000.0)
 
     def __iter__(self):
         return self.photos
@@ -603,7 +616,7 @@ class PhotoAsset:
     def isFavorite(self):
         if self._asset_record['fields'].get('isFavorite'):
             return self._asset_record['fields'].get('isFavorite')['value']
-            
+
     @property
     def size(self):
         """Gets the photo size."""
