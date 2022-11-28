@@ -83,6 +83,18 @@ class PhotosService:
                 }
             ],
         },
+        "Portrait": {
+            "obj_type": "CPLAssetInSmartAlbumByAssetDate:Portrait",
+            "list_type": "CPLAssetAndMasterInSmartAlbumByAssetDate",
+            "direction": "ASCENDING",
+            "query_filter": [
+                {
+                    "fieldName": "smartAlbum",
+                    "comparator": "EQUALS",
+                    "fieldValue": {"type": "STRING", "value": "DEPTH"},
+                }
+            ],
+        },
         "Screenshots": {
             "obj_type": "CPLAssetInSmartAlbumByAssetDate:Screenshot",
             "list_type": "CPLAssetAndMasterInSmartAlbumByAssetDate",
@@ -163,7 +175,7 @@ class PhotosService:
         """Returns photo albums."""
         if not self._albums:
             self._albums = {
-                name: PhotoAlbum(self, name, **props)
+                name: PhotoAlbum(self, name, **props, folder=props)
                 for (name, props) in self.SMART_FOLDERS.items()
             }
 
@@ -185,7 +197,7 @@ class PhotosService:
                     "CPLContainerRelationNotDeletedByAssetDate:%s" % folder_id
                 )
                 folder_name = base64.b64decode(
-                    folder["fields"]["albumNameEnc"]["value"]
+                    folder["fields"].get("albumNameEnc", {}).get("value")
                 ).decode("utf-8")
                 query_filter = [
                     {
@@ -251,14 +263,14 @@ class PhotoAlbum:
         self.page_size = page_size
 
         self._len = None
-        self._folder = folder
+        self._folder = folder or {}
 
     @property
     def title(self):
         """Gets the album name."""
         return self.name
 
-    
+    @property
     def id(self):
         return self._folder.get("recordName")
     
@@ -594,7 +606,7 @@ class PhotoAsset:
         if location:
             return location['lat'][1]
         metadata = self.mediaMetaData
-        if metadata and metadata['{GPS}']:
+        if metadata and metadata.get('{GPS}'):
             return metadata['{GPS}']['Latitude'][1]
 
     
@@ -604,7 +616,7 @@ class PhotoAsset:
         if location:
             return location['lon'][1]
         metadata = self.mediaMetaData
-        if metadata and metadata['{GPS}']:
+        if metadata and metadata.get('{GPS}'):
             return metadata['{GPS}']['Longitude'][1]
         
     @property
