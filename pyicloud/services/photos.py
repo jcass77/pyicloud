@@ -324,12 +324,12 @@ class PhotoAlbum:
         return self._len
 
     @property
-    def photos(self):
+    def photos(self, initial_offset=0):
         """Returns the album photos."""
         if self.direction == "DESCENDING":
-            offset = len(self) - 1
+            offset = len(self) - 1 - initial_offset
         else:
-            offset = 0
+            offset = 0 + initial_offset
 
         while True:
             url = ("%s/records/query?" % self.service.service_endpoint) + urlencode(
