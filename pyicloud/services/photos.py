@@ -588,22 +588,22 @@ class PhotoAsset:
 
     @property
     def location(self):
-        if self._asset_record['fields'].get('locationEnc'):
-            value = base64.b64decode(self._asset_record['fields']['locationEnc']['value'])
-
-            return BPListReader(value).parse()
+        if value := self._asset_record['fields'].get('locationEnc', {}).get("value"):
+            try:
+                return BPListReader(value).parse()
+            except Exception as e:
+                print(value, e)
+                return 
 
     @property
     def mediaMetaData(self):
-        if self._master_record['fields'].get('mediaMetaDataEnc'):
-            value = base64.b64decode(self._master_record['fields']['mediaMetaDataEnc']['value'])
+        if value := self._master_record['fields'].get('mediaMetaDataEnc', {}).get("value"):
             return BPListReader(value).parse()
 
 
     @property
     def latitude(self):
-        location = self.location
-        if location:
+        if location := self.location:
             return location['lat'][1]
         metadata = self.mediaMetaData
         if metadata and metadata.get('{GPS}'):
